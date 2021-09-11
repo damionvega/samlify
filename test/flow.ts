@@ -7,7 +7,7 @@ import * as url from 'url';
 import util from '../src/utility';
 import * as tk from 'timekeeper';
 
-import * as validator from '@authenio/samlify-xsd-schema-validator';
+// import * as validator from '@authenio/samlify-xsd-schema-validator';
 // import * as validator from '@authenio/samlify-validate-with-xmllint';
 // import * as validator from '@authenio/samlify-node-xmllint';
 // import * as validator from '@authenio/samlify-libxml-xsd';
@@ -17,7 +17,15 @@ import * as validator from '@authenio/samlify-xsd-schema-validator';
 // const validator = require('@authenio/samlify-node-xmllint');
 // const validator = require('@authenio/samlify-libxml-xsd');
 
-esaml2.setSchemaValidator(validator);
+// esaml2.setSchemaValidator(validator);
+
+// Add validate function in order to suppress warning
+esaml2.setSchemaValidator({
+  validate: (response: string) => {
+    /* Implement your own or always returns a resolved promise to skip */
+    return Promise.resolve('skipped');
+  }
+});
 
 const isString = util.isString;
 
@@ -621,7 +629,7 @@ test('avoid malformatted response', async t => {
 });
 
 test('should reject signature wrapped response - case 1', async t => {
-  // 
+  //
   const user = { email: 'user@esaml2.com' };
   const { id, context: SAMLResponse } = await idpNoEncrypt.createLoginResponse(sp, sampleRequestInfo, 'post', user, createTemplateCallback(idpNoEncrypt, sp, user));
   //Decode
@@ -645,7 +653,7 @@ test('should reject signature wrapped response - case 1', async t => {
 });
 
 test('should reject signature wrapped response - case 2', async t => {
-  // 
+  //
   const user = { email: 'user@esaml2.com' };
   const { id, context: SAMLResponse } = await idpNoEncrypt.createLoginResponse(sp, sampleRequestInfo, 'post', user, createTemplateCallback(idpNoEncrypt, sp, user));
   //Decode
