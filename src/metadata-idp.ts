@@ -62,6 +62,20 @@ export class IdpMetadata extends Metadata {
         nameIDFormat.forEach(f => IDPSSODescriptor.push({ NameIDFormat: f }));
       }
 
+      if (isNonEmptyArray(singleLogoutService)) {
+        singleLogoutService.forEach((a, indexCount) => {
+          const attr: any = {};
+          if (a.isDefault) {
+            attr.isDefault = true;
+          }
+          attr.Binding = a.Binding;
+          attr.Location = a.Location;
+          IDPSSODescriptor.push({ SingleLogoutService: [{ _attr: attr }] });
+        });
+      } else {
+        console.warn('Construct identity  provider - missing endpoint of SingleLogoutService');
+      }
+
       if (isNonEmptyArray(singleSignOnService)) {
         singleSignOnService.forEach((a, indexCount) => {
           const attr: any = {
@@ -77,19 +91,6 @@ export class IdpMetadata extends Metadata {
         throw new Error('ERR_IDP_METADATA_MISSING_SINGLE_SIGN_ON_SERVICE');
       }
 
-      if (isNonEmptyArray(singleLogoutService)) {
-        singleLogoutService.forEach((a, indexCount) => {
-          const attr: any = {};
-          if (a.isDefault) {
-            attr.isDefault = true;
-          }
-          attr.Binding = a.Binding;
-          attr.Location = a.Location;
-          IDPSSODescriptor.push({ SingleLogoutService: [{ _attr: attr }] });
-        });
-      } else {
-        console.warn('Construct identity  provider - missing endpoint of SingleLogoutService');
-      }
       // Create a new metadata by setting
       meta = xml([{
         EntityDescriptor: [{
